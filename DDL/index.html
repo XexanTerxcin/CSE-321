@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Data Link Layer | Cyberpunk OSI | Neon Pulse</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <!-- Google Fonts: Futuristic & Monospace Mix -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background: #05070a;
+            background-image: radial-gradient(circle at 15% 30%, rgba(0, 255, 100, 0.04) 1px, transparent 1px);
+            background-size: 36px 36px;
+            font-family: 'Inter', 'Courier New', monospace;
+            color: #eef5ff;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+        a{
+            text-decoration: none;
+            color: #00ff00;
+            cursor: pointer;
+        }
+
+        /* Animated scanning line overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0, 255, 65, 0.02) 0px, rgba(0, 255, 65, 0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 1;
+            animation: scanMove 18s linear infinite;
+        }
+
+        @keyframes scanMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 20px; }
+        }
+
+        /* Glossy Glass Effect - Modern glassmorphism panels */
+        .glass-card {
+            background: rgba(8, 14, 18, 0.45);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-radius: 2rem;
+            border: 1px solid rgba(0, 255, 100, 0.35);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .cyber-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(5, 8, 12, 0.6);
+            backdrop-filter: blur(5px);
+            border-radius: 2.5rem;
+            padding: 2rem 2rem 2.5rem;
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(0, 255, 150, 0.25);
+            transition: all 0.4s ease;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(0, 255, 100, 0.2);
+        }
+
+        .cyber-container:hover {
+            border-color: rgba(0, 255, 150, 0.6);
+            box-shadow: 0 30px 55px rgba(0,0,0,0.7), 0 0 0 2px rgba(0, 255, 100, 0.4);
+        }
+
+        /* Animated gradient border refinement */
+        .cyber-container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 2.5rem;
+            padding: 2px;
+            background: linear-gradient(135deg, #00ff88, #00cc44, #33ffaa, #00ff66);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            animation: borderWave 4s infinite alternate;
+        }
+
+        @keyframes borderWave {
+            0% { opacity: 0.4; filter: blur(0px); background-position: 0% 50%;}
+            100% { opacity: 1; filter: blur(0.6px); background-position: 100% 50%;}
+        }
+
+        /* Status Bar Glass */
+        .sys-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(10, 20, 16, 0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 0.6rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(0, 255, 100, 0.4);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .status-led {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .led {
+            width: 12px;
+            height: 12px;
+            background-color: #0aff66;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #0aff66;
+            animation: pulseGlow 1.2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(0.8); box-shadow: 0 0 2px #0aff66; }
+            100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 16px #0aff66; }
+        }
+
+        .clock {
+            color: #9effb0;
+            background: rgba(0, 20, 8, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            border: 1px solid #00ff8866;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Futuristic headings */
+        h1 {
+            color: #00ff99;
+            font-size: 2.1rem;
+            font-weight: 700;
+            margin: 1rem 0 0.8rem;
+            text-shadow: 0 0 6px #00ff99, 0 0 12px #00cc4480;
+            display: inline-block;
+            letter-spacing: -0.3px;
+            position: relative;
+        }
+        h1::after {
+            content: "▌";
+            font-family: monospace;
+            font-size: 2rem;
+            margin-left: 6px;
+            color: #0aff77;
+            animation: pulseOpacity 1s step-end infinite;
+            display: inline-block;
+        }
+        @keyframes pulseOpacity {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        h3 {
+            color: #0affaa;
+            font-size: 1.6rem;
+            margin: 1.2rem 0 0.8rem;
+            background: linear-gradient(90deg, #00ffaa30, transparent);
+            padding: 0.3rem 0 0.3rem 1rem;
+            border-left: 6px solid #00ffaa;
+            letter-spacing: -0.2px;
+            backdrop-filter: blur(2px);
+        }
+
+        p, li {
+            line-height: 1.55;
+            font-size: 1.05rem;
+            font-weight: 400;
+        }
+
+        ul, ol {
+            margin: 0.8rem 0 1rem 1.8rem;
+        }
+
+        li {
+            margin: 0.6rem 0;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            position: relative;
+        }
+
+        li:hover {
+            transform: translateX(10px) scale(1.01);
+            text-shadow: 0 0 5px #0aff88;
+            color: #ffffff;
+        }
+
+        hr {
+            margin: 2.5rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ff88, #77ffaa, #00ff88, transparent);
+        }
+
+        /* Glass image cards with 3D tilt perspective on hover */
+        .img-card {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(3px);
+            transition: all 0.4s;
+            border: 1px solid rgba(0, 255, 150, 0.5);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+            transform-style: preserve-3d;
+        }
+
+        .img-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 35px -8px rgba(0, 255, 100, 0.3);
+            border-color: #0aff88;
+        }
+
+        .img-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: all 0.5s;
+            filter: brightness(0.93) contrast(1.08) saturate(1.1);
+        }
+
+        .img-card:hover img {
+            filter: brightness(1.02) contrast(1.05) saturate(1.2);
+            transform: scale(1.01);
+        }
+
+        .img-caption {
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            padding: 10px 16px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: #bbffdd;
+            border-top: 1px solid #0aff8840;
+            letter-spacing: 0.3px;
+        }
+
+        /* split layout */
+        .split-layout {
+            display: flex;
+            gap: 2.2rem;
+            margin: 2.5rem 0;
+            flex-wrap: wrap;
+        }
+        .split-layout.reverse {
+            flex-direction: row-reverse;
+        }
+        .media-block {
+            flex: 1;
+            min-width: 240px;
+        }
+        .content-block {
+            flex: 1.2;
+            min-width: 240px;
+        }
+
+        /* Protocol tooltip */
+        .protocol-term {
+            color: #4affb5;
+            font-weight: 600;
+            cursor: help;
+            border-bottom: 2px dotted #0affaa;
+            transition: all 0.2s;
+        }
+        .protocol-term:hover {
+            text-shadow: 0 0 6px #0affaa;
+        }
+
+        .inline-code {
+            background: rgba(0, 30, 10, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-family: monospace;
+            color: #bbffaa;
+            font-size: 0.85rem;
+            border: 1px solid #00ff8844;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2.8rem;
+            font-size: 0.7rem;
+            opacity: 0.8;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            padding: 1rem;
+            border-radius: 2rem;
+        }
+
+        /* Custom cursor style */
+        .custom-cursor {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #0aff99;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
+            backdrop-filter: invert(0.1) blur(1px);
+            box-shadow: 0 0 16px #0aff99, inset 0 0 6px #0aff99;
+            will-change: transform;
+        }
+        
+        .cursor-follower {
+            width: 8px;
+            height: 8px;
+            background: #ccff88;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            filter: blur(1px);
+            transition: 0.08s linear;
+            box-shadow: 0 0 20px #0affaa;
+            will-change: transform;
+        }
+        
+        .custom-cursor.active {
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 255, 100, 0.2);
+            border-color: #bbffaa;
+            box-shadow: 0 0 28px #0aff99;
+        }
+        
+        /* TRAIL PARTICLES (small orbiting dust) */
+        .trail-particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #0aff88, #00cc66);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9997;
+            opacity: 0.9;
+            filter: blur(0.5px);
+            box-shadow: 0 0 8px #2effaa;
+            animation: fadeOutParticle 0.7s ease-out forwards;
+        }
+        
+        @keyframes fadeOutParticle {
+            0% {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.2) translate(var(--x-trail, 6px), var(--y-trail, 6px));
+            }
+        }
+
+        /* Glitch overlay */
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 80, 0.03);
+            pointer-events: none;
+            z-index: 9995;
+            opacity: 0;
+            transition: opacity 0.08s;
+        }
+
+        /* Fade slide & futuristic animation */
+        .fade-slide-up {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2), transform 0.7s ease;
+        }
+        .fade-slide-up.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Pulse energy on container */
+        @keyframes energyPulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,255,100,0);}
+            100% { box-shadow: 0 0 0 4px rgba(0,255,100,0);}
+        }
+        
+        .glitch-once {
+            animation: textGlitch 0.2s 2 alternate;
+        }
+        @keyframes textGlitch {
+            0% { text-shadow: -2px 0 #ff00aa, 2px 0 #0affaa; transform: skew(0.6deg);}
+            50% { text-shadow: 1px 0 #0affaa, -1px 0 #ff44aa; transform: skew(-0.4deg);}
+            100% { text-shadow: none; transform: skew(0);}
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .split-layout, .split-layout.reverse { flex-direction: column; }
+            body { cursor: auto; }
+            .custom-cursor, .cursor-follower { display: none; }
+            .cyber-container { padding: 1.2rem; }
+        }
+        ::-webkit-scrollbar { width: 8px; background: #0a120e; }
+        ::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 20px; }
+        
+        /* micro magnetic animation for glass elements */
+        .glass-magnetic {
+            transition: transform 0.2s ease-out;
+        }
+        /* Disable custom cursors */
+.custom-cursor, .cursor-follower {
+    display: none !important;
+}
+
+body, a, .protocol-term, .img-card, button, .clock, .status-led span {
+    cursor: auto !important;
+}
+    </style>
+</head>
+<body>
+
+<div class="custom-cursor" id="customCursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+<div class="glitch-overlay" id="glitchOverlay"></div>
+
+<main class="cyber-container">
+    
+    <div class="sys-status glass-card">
+        <div class="status-led">
+            <span class="led"></span>
+            <span>⟡ DATA LINK ACTIVE // FRAME SYNC ⟡ CRYPTO TRAIL ENABLED</span>
+        </div>
+        <div class="clock" id="cyberClock">--:--:-- UTC</div>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="split-layout">
+        <div class="media-block fade-slide-up">
+            <div class="img-card">
+                <img src="1.png" alt="OSI Model Data Link Layer cyberpunk">
+                <div class="img-caption">OSI MODEL - DATA LINK LAYER || Source: Generated using Copilot</div>
+            </div>
+        </div>
+        <div class="content-block glass-card" style="padding: 1.5rem; background: rgba(0,20,10,0.4);">
+            <h1>Data Link Layer in OSI Model</h1>
+            <p>The Data Link Layer is the heartbeat of local network communication — raw bits transform into structured frames, errors vanish, and medium access is orchestrated with precision.</p>
+            <ul>
+                <li>📦 Framing: Organizes bits into addressable frames.</li>
+                <li>🛡️ Error Control: CRC & checksums ensure integrity.</li>
+                <li>🌊 Flow Control: Prevents data flood between devices.</li>
+                <li>🎛️ MAC: Coordinates who speaks on the shared channel.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="split-layout reverse">
+        <div class="media-block fade-slide-up">
+            <div class="img-card">
+                <img src="2.png" alt="Framing and DLL core tasks">
+                <div class="img-caption">Jobs of DLL || Source: Generated using Copilot</div>
+            </div>
+        </div>
+        <div class="content-block glass-card" style="padding: 1.5rem;">
+            <h1>⚙️ Core Jobs of Data Link Layer</h1>
+            <ol>
+                <li><span class="inline-code">Framing</span> → Encapsulation of packets into frames with headers & trailers.</li>
+                <li><span class="inline-code">Error detection/correction</span> → FCS, CRC, ARQ mechanisms.</li>
+                <li><span class="inline-code">Flow control</span> → Sliding window, backpressure.</li>
+                <li><span class="inline-code">Media Access Control</span> → CSMA/CD, CSMA/CA, Token passing.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Section 3: Protocols (long list) -->
+    <div class="split-layout">
+        <div class="media-block fade-slide-up">
+            <div class="img-card">
+                <img src="3.png" alt="Data Link protocols diagram">
+                <div class="img-caption">Protocol - DLL || Source: Generated using Copilot</div>
+            </div>
+        </div>
+        <div class="content-block glass-card" style="padding: 1.5rem;">
+            <h1>🔌 Prominent Data Link Protocols</h1>
+            <ul style="columns: 1; gap: 0.5rem;">
+                <li><span class="protocol-term" data-tooltip="IEEE 802.3 wired LAN">Ethernet (IEEE 802.3)</span></li>
+                <li><span class="protocol-term" data-tooltip="Wireless LAN 802.11">Wi-Fi (IEEE 802.11)</span></li>
+                <li><span class="protocol-term" data-tooltip="Point-to-Point Protocol">PPP</span></li>
+                <li><span class="protocol-term" data-tooltip="High-Level Data Link Control">HDLC</span></li>
+                <li><span class="protocol-term" data-tooltip="Synchronous Data Link Control">SDLC</span></li>
+                <li><span class="protocol-term" data-tooltip="Serial Line IP">SLIP</span></li>
+                <li><span class="protocol-term" data-tooltip="Link Access Procedure">LAP</span></li>
+                <li><span class="protocol-term" data-tooltip="Link Control Protocol">LCP</span></li>
+                <li><span class="protocol-term" data-tooltip="Network Control Protocol">NCP</span></li>
+            </ul>
+            <p>Each protocol defines framing, addressing, and error control schemes, enabling seamless communication over links from Ethernet cables to satellite beams.</p>
+        </div>
+    </div>
+
+    <!-- Error Control ARQ + Sliding window -->
+    <div class="split-layout reverse">
+        <div class="media-block fade-slide-up">
+            <div class="img-card">
+                <img src="4.png" alt="ARQ Stop-and-Wait vs Sliding Window">
+                <div class="img-caption">Stop-and-Wait ARQ & Sliding Window Protocol || Source: Generated using Copilot</div>
+            </div>
+        </div>
+        <div class="content-block">
+            <h1>🎯 Error Control Protocols</h1>
+            <h3>⏸ Stop-and-Wait ARQ</h3>
+            <ul><li>Simplest: send frame → wait ACK → timeout resend. Reliable but low throughput.</li></ul>
+            <h3>⚡ Sliding Window Protocol</h3>
+            <ul><li>Sender window of N frames; pipeline transmission, Go-Back-N & Selective Repeat increase efficiency exponentially.</li>
+            <li>Analogy: High-speed rail of data packets with smart acknowledgments.</li></ul>
+        </div>
+    </div>
+
+    <!-- Wi-Fi & MAC deep dive -->
+    <div class="split-layout">
+        <div class="media-block fade-slide-up">
+            <div class="img-card">
+                <img src="6.png" alt="CSMA/CA Wireless Access">
+                <div class="img-caption">MAC Address || Source: Generated using Copilot</div>
+            </div>
+        </div>
+        <div class="content-block glass-card" style="padding:1.5rem;">
+            <h1>📡 Media Access Control & MAC Addressing</h1>
+            <p><span class="inline-code">MAC (Media Access Control)</span> sublayer manages channel arbitration & collision avoidance. Each network interface gets a 48-bit unique MAC address (e.g., 00:1A:2B:3C:4D:5E).</p>
+            <ul>
+                <li>Wired: CSMA/CD (Collision Detection)</li>
+                <li>Wireless: CSMA/CA (Collision Avoidance) plus RTS/CTS handshake.</li>
+                <li>Wi-Fi frames carry source/destination MACs, ensuring delivery in wireless cells.</li>
+            </ul>
+            <p>Without MAC, networks would collapse into chaos — the true traffic conductor of Layer 2.</p>
+        </div>
+    </div>
+
+    <hr>
+    <footer>
+        <span class="inline-code">This webpage is created by <a href="https://github.com/XexanTerxcin">Xexan Terxcin</a></span><br>
+    </footer>
+</main>
+
+<script>
+    (function() {
+        // 1) Dynamic Clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toUTCString().split(' ')[4];
+            const clockDiv = document.getElementById('cyberClock');
+            if(clockDiv) clockDiv.innerText = timeStr + " UTC";
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        // 2) Initial glitch animation for headings
+        document.querySelectorAll('h1').forEach((h, idx) => {
+            setTimeout(() => { h.classList.add('glitch-once'); setTimeout(() => h.classList.remove('glitch-once'), 350); }, 100 + idx * 90);
+        });
+        
+        // 3) Intersection Observer for glass slide-up
+        const fadeObs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    fadeObs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.fade-slide-up').forEach(el => fadeObs.observe(el));
+        
+        // ========== 4) ADVANCED CURSOR FOLLOW + SMALL PARTICLE TRAIL (more particles) ==========
+        const cursorEl = document.getElementById('customCursor');
+        const followerEl = document.getElementById('cursorFollower');
+        const glitchOverlay = document.getElementById('glitchOverlay');
+        let mouseX = 0, mouseY = 0;
+        let followerX = 0, followerY = 0;
+        let lastParticleTime = 0;
+        
+        function createTrailParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.classList.add('trail-particle');
+            // Random tiny offset for scatter
+            const offX = (Math.random() - 0.5) * 6;
+            const offY = (Math.random() - 0.5) * 6;
+            particle.style.left = (x + offX) + 'px';
+            particle.style.top = (y + offY) + 'px';
+            // dynamic variable for animation drift
+            particle.style.setProperty('--x-trail', (Math.random() * 12 - 6) + 'px');
+            particle.style.setProperty('--y-trail', (Math.random() * 12 - 6) + 'px');
+            document.body.appendChild(particle);
+            setTimeout(() => { if(particle && particle.remove) particle.remove(); }, 700);
+        }
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if(cursorEl) {
+                cursorEl.style.left = mouseX + 'px';
+                cursorEl.style.top = mouseY + 'px';
+            }
+            const nowTime = Date.now();
+            if(nowTime - lastParticleTime > 35) {
+                createTrailParticle(mouseX, mouseY);
+                lastParticleTime = nowTime;
+            }
+        });
+        
+        function animateFollowerSmooth() {
+            if(!followerEl) return;
+            followerX += (mouseX - followerX) * 0.22;
+            followerY += (mouseY - followerY) * 0.22;
+            followerEl.style.left = followerX + 'px';
+            followerEl.style.top = followerY + 'px';
+            requestAnimationFrame(animateFollowerSmooth);
+        }
+        animateFollowerSmooth();
+        
+        // Hover interactive cursor scale + glitch flash
+        const interactives = document.querySelectorAll('a, .protocol-term, .img-card, button, .clock, .status-led span, h1, h3, li, .inline-code');
+        interactives.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if(cursorEl) cursorEl.classList.add('active');
+                if(glitchOverlay) {
+                    glitchOverlay.style.opacity = '0.07';
+                    setTimeout(() => { if(glitchOverlay) glitchOverlay.style.opacity = '0'; }, 110);
+                }
+            });
+            el.addEventListener('mouseleave', () => {
+                if(cursorEl) cursorEl.classList.remove('active');
+            });
+        });
+        
+        // random glitch overlay for cyberpunk vibe
+        setInterval(() => {
+            if(Math.random() > 0.9) {
+                glitchOverlay.style.opacity = '0.06';
+                setTimeout(() => { glitchOverlay.style.opacity = '0'; }, 90);
+                const container = document.querySelector('.cyber-container');
+                if(container) {
+                    container.style.transform = 'translateX(2px)';
+                    setTimeout(() => { if(container) container.style.transform = ''; }, 40);
+                }
+            }
+        }, 2200);
+        
+        // Magnetic micro effect on glass cards
+        const glassCards = document.querySelectorAll('.glass-card, .img-card');
+        glassCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width/2;
+                const centerY = rect.height/2;
+                const moveX = (x - centerX) * 0.03;
+                const moveY = (y - centerY) * 0.03;
+                card.style.transform = `perspective(800px) rotateX(${-moveY*0.2}deg) rotateY(${moveX*0.2}deg) translateZ(2px)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+        
+        // ========== 5) ADDITIONAL SMALL FLOATING GLASS PARTICLES (FUTURISTIC BACKGROUND) ==========
+        const particleCanvas = document.createElement('canvas');
+        particleCanvas.style.position = 'fixed';
+        particleCanvas.style.top = '0';
+        particleCanvas.style.left = '0';
+        particleCanvas.style.width = '100%';
+        particleCanvas.style.height = '100%';
+        particleCanvas.style.pointerEvents = 'none';
+        particleCanvas.style.zIndex = '9994';
+        particleCanvas.style.opacity = '0.5';
+        document.body.appendChild(particleCanvas);
+        const ctx = particleCanvas.getContext('2d');
+        let bgParticles = [];
+        
+        function resizeBgCanvas() {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeBgCanvas);
+        resizeBgCanvas();
+        
+        class GlassParticle {
+            constructor() {
+                this.x = Math.random() * particleCanvas.width;
+                this.y = Math.random() * particleCanvas.height;
+                this.radius = Math.random() * 2.5 + 0.8;
+                this.alpha = Math.random() * 0.3 + 0.1;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = (Math.random() - 0.5) * 0.1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if(this.x < 0) this.x = particleCanvas.width;
+                if(this.x > particleCanvas.width) this.x = 0;
+                if(this.y < 0) this.y = particleCanvas.height;
+                if(this.y > particleCanvas.height) this.y = 0;
+            }
+            draw() {
+                if(!ctx) return;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                ctx.fillStyle = `rgba(100, 255, 140, ${this.alpha * 0.5})`;
+                ctx.fill();
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = "#0affaa";
+            }
+        }
+        for(let i=0;i<120;i++) bgParticles.push(new GlassParticle());
+        function animateBgParticles() {
+            if(!ctx) return;
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            bgParticles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateBgParticles);
+        }
+        animateBgParticles();
+        
+        // Extra: small ripple style on container for futuristic feedback
+        console.log("🚀 FUSION GLASS + DATA LINK | TRAIL PARTICLES ACTIVE | SLIDING WINDOW READY");
+    })();
+</script>
+</body>
+</html>
